@@ -166,15 +166,11 @@ public final class AsynchronousDataTransaction: BaseDataTransaction {
     internal func autoCommit(_ completion: @escaping (_ hasChanges: Bool, _ error: CoreStoreError?) -> Void) {
         
         self.isCommitted = true
-        let group = DispatchGroup()
-        group.enter()
         self.context.saveAsynchronouslyWithCompletion { (hasChanges, error) -> Void in
             
             completion(hasChanges, error)
             self.result = (hasChanges, error)
-            group.leave()
+            self.context.reset()
         }
-        group.wait()
-        self.context.reset()
     }
 }
